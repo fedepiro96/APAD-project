@@ -1,2 +1,2 @@
 # APAD-project
-My first repository
+Our first repository
