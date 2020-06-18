@@ -1,5 +1,5 @@
-## Project Assignment
-#Setup
+# Project Assignment
+## Setup
 
 Data about Covid19 with respect to our country, Italy.
 Let’s start: download the data available at https://github.com/pcm-dpc/COVID-19. In particular, clone the Git repository locally.
@@ -12,7 +12,7 @@ with open('dpc-covid19-ita-province.json') as f:
 
          d = json.load(f)
 
-# Building the graphs
+## Building the graphs
 
 - Build the graph of provinces P using NetworkX.
   - Each node corresponds to a city and two cities a and b are connected by an edge if the following holds: if x,y is the position of a, then b is in position z,w with z in [x-d,x+d] and w in [y-d, y+d], with d=0.8. The graph is symmetric. Use the latitude and longitude information available in the files to get the position of the cities. This task can be done in several ways. Use the one you think is more efficient.
@@ -27,7 +27,7 @@ with open('dpc-covid19-ita-province.json') as f:
   - apply them both to P and R
 - Prepare slides (the presentation will last 15 minutes per person) explaining the chosen algorithms, your implementations, and their applications to a toy example.
 
-# Pandas
+## Pandas
 
 Until now we have only used the name of the cities and their corresponding position. We now use the remaining data.
 
@@ -44,7 +44,7 @@ All the previous points have to be collected in a Jupyter notebook, nicely prepa
 You can use the interpreter and environment that best suit your needs, justify and report them clearly in the notebook. Btw, we will redo your notebook using the official interpreter from https://www.python.org/downloads/ and Jupyter from pip).
 Do easy steps and justify them to move over more complex ones. Describe how you design your work and comment your code in order to give us the opportunity to read your manuscript from top to bottom without “interruptions” due to reverse-engineering what you have done (of course we will review together in the oral session of the exam).
 
-# Sending files
+## Sending files
 
 Each student must send the following files:
 
