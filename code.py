@@ -12,15 +12,16 @@ with open('/home/noe/Università/in_corso/Algoritmi/APAD-project/dati/dati-json/
 # print(d)
 
 P = nx.Graph()
-
+dist = {}
 for record in d:                                                # per ogni osservazione
     if record['lat']!=0 and record['long']!=0:                  # elimino i record sbagliati
-        for provincia in list(P.nodes):                         # per ogni nodo nella lista dei nodi
-            if record['denominazione_provincia']!=provincia:    # se non
+        if record['denominazione_provincia'] not in list(P.nodes):
             P.add_node(record['denominazione_provincia'])
-
-
+            dist[record['denominazione_provincia']] = {'long' : record['long'], 'lat': record['lat']}
 print(list(P.nodes))
+print(dist)
 
+for i in dist:
+    print(dist[i]['lat'])
 def graph_builder(data, d=0.8):
     return None
