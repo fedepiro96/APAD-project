@@ -14,7 +14,6 @@ for record in d:                                                # per ogni osser
             longs[record['sigla_provincia']] = record['long']
 
 prov_sort = sorted(lats, key=lats.get)
-def
 
 def graph_builder(node_list_sort, lat, long, dist):
     """It build a graph nodes are cities contained in node_list_sort
@@ -44,10 +43,58 @@ print(P.nodes())
 print(P.edges())
 print(len(P.edges()))
 
+from random import random
+from random import randrange
+print(randrange(30, 49))
+
+def generate_x():
+    """Random generator for latitude"""
+    while True:
+        r = randrange(30, 49)
+        eps = random()
+        yield r+eps
+
+def generate_y():
+    """Random generator for longitude"""
+    while True:
+        r = randrange(10, 19)
+        eps = random()
+        yield r+eps
+
+def random_graph(n):
+    """It build:
+    - a list of nodes with length n;
+    - a dictionary where each node (key) is associated to a random latitude;
+    - a dictionary where each node (key) is associated to a random longitude;
+    The function exploits two generator for latitude and longitude"""
+    node_list = []
+    lat = {}
+    long = {}
+    x = generate_x()
+    y = generate_y()
+    for i in range(n):
+        node_list.append(i)
+        lat[i] = next(x)
+        long[i] = next(y)
+    return node_list, lat, long
+
+
+rand_nodes, rand_lat, rand_long = random_graph(2000)
+
+rand_graph1 = graph_builder(sorted(rand_lat, key=rand_lat.get), rand_lat, rand_long, dist=0.8)
+print(rand_graph1.nodes())
+print(rand_graph1.edges())
+print(len(rand_graph1.edges()))
+
 R = graph_builder(prov_sort, lats, longs, dist=0.08)
 print(R.nodes())
 print(R.edges())
 print(len(R.edges()))
+
+rand_graph2 = graph_builder(sorted(rand_lat, key=rand_lat.get), rand_lat, rand_long, dist=0.08)
+print(rand_graph2.nodes())
+print(rand_graph2.edges())
+print(len(rand_graph2.edges()))
 
 
 
