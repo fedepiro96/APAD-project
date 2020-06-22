@@ -15,20 +15,27 @@ for record in d:                                                # per ogni osser
 
 prov_sort = sorted(lats, key=lats.get)
 
-def graph_builder(node_list_sort, lat, long, dist):
+def graph_builder(node_list_sort, lat, long, dist_max, weight=False):
     """It build a graph nodes are cities contained in node_list_sort
-    two cities are linked if their lats and longs are nearer than d.
+    two cities are linked if their lats and longs are nearer than dist_max.
     node_list_sort: list of cities sorted by latitudes
     lat: dictionary where each node (key) is associated to its latitude
-    long: dictionary where each node (key) is associated to its longitude"""
+    long: dictionary where each node (key) is associated to its longitude
+    if weight=True the edges are weighted with the Euclidean distance between the cities"""
     G = nx.Graph()
+    dist = {}
     i = 0
     j = 1
     while i <= (len(node_list_sort)-1):
         G.add_node(node_list_sort[i])
-        if j <= (len(node_list_sort)-1) and abs(lat[node_list_sort[i]] - lat[node_list_sort[j]]) < dist:
-            if abs(long[node_list_sort[i]] - long[node_list_sort[j]]) < dist:
+        if j <= (len(node_list_sort)-1) and abs(lat[node_list_sort[i]] - lat[node_list_sort[j]]) < dist_max:
+            if abs(long[node_list_sort[i]] - long[node_list_sort[j]]) < dist_max:
                 G.add_edge(node_list_sort[i], node_list_sort[j])
+                if weight:
+                    lat_diff = (lat[node_list_sort[i]] - lat[node_list_sort[j]])**2
+                    long_diff = (long[node_list_sort[i]] - long[node_list_sort[j]])**2
+                    dist[node_list_sort[i], node_list_sort[j]] = (lat_diff + long_diff)**(1/2)
+                    nx.set_edge_attributes(G, dist, 'distance')
                 j += 1
             else:
                 j += 1
@@ -38,10 +45,10 @@ def graph_builder(node_list_sort, lat, long, dist):
     return G
 
 
-P = graph_builder(prov_sort, lats, longs, dist=0.8)
-print(P.nodes())
-print(P.edges())
-print(len(P.edges()))
+P = graph_builder(prov_sort, lats, longs, dist_max=0.8)
+# print(P.nodes())
+# print(P.edges())
+# print(len(P.edges()))
 
 from random import random
 from random import randrange
@@ -81,21 +88,25 @@ def random_graph(n):
 
 rand_nodes, rand_lat, rand_long = random_graph(2000)
 
-rand_graph1 = graph_builder(sorted(rand_lat, key=rand_lat.get), rand_lat, rand_long, dist=0.8)
-print(rand_graph1.nodes())
-print(rand_graph1.edges())
-print(len(rand_graph1.edges()))
+rand_graph1 = graph_builder(sorted(rand_lat, key=rand_lat.get), rand_lat, rand_long, dist_max=0.8)
+# print(rand_graph1.nodes())
+# print(rand_graph1.edges())
+# print(len(rand_graph1.edges()))
 
-R = graph_builder(prov_sort, lats, longs, dist=0.08)
-print(R.nodes())
-print(R.edges())
-print(len(R.edges()))
+R = graph_builder(prov_sort, lats, longs, dist_max=0.08)
+# print(R.nodes())
+# print(R.edges())
+# print(len(R.edges()))
 
-rand_graph2 = graph_builder(sorted(rand_lat, key=rand_lat.get), rand_lat, rand_long, dist=0.08)
-print(rand_graph2.nodes())
-print(rand_graph2.edges())
-print(len(rand_graph2.edges()))
+rand_graph2 = graph_builder(sorted(rand_lat, key=rand_lat.get), rand_lat, rand_long, dist_max=0.08)
+# print(rand_graph2.nodes())
+# print(rand_graph2.edges())
+# print(len(rand_graph2.edges()))
 
+P_weight = graph_builder(prov_sort, lats, longs, dist_max=0.8, weight=True)
+print(nx.get_edge_attributes(P_weight, 'distance'))
+R_weight = graph_builder(prov_sort, lats, longs, dist_max=0.08, weight=True)
+print(nx.get_edge_attributes(R_weight, 'distance'))
 
 
 
