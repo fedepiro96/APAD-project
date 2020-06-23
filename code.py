@@ -136,7 +136,7 @@ def triangles_discover(G):
                 for j in range(i+1, len(near)-1):
                     neigh_j = near[j]
                     if degree[node] < degree[neigh_i] and degree[node] < degree[neigh_j]:
-                        if neigh_j in P.neighbors(neigh_i):
+                        if neigh_j in G.neighbors(neigh_i):
                             triangles.append((node, neigh_i, neigh_j))
     return triangles
 
