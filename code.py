@@ -110,11 +110,39 @@ R_weight = graph_builder(prov_sort, lats, longs, dist_max=0.08, weight=True)
 # plt.savefig("/home/noe/Università/in_corso/Algoritmi/APAD-project/mygraph.png")
 
 # counting triangles
-nodes = P.nodes()
-numb_triangles = 0
+def sorted_degree(nodes):
+    """It calculates the degree for each node
+    and it returns a list of nodes sorted by degree
+    """
+    deg = {}
+    for n in nodes:
+        deg[n] = len(P[n])
+    return deg, sorted(deg, key=deg.get)
 
-print(prov_sort)
+# print(sort_deg, degree)
+def triangles_discover(G):
+    """Given a graph G, this function returns the list of triangles
+    """
+    degree, sort_deg = sorted_degree(list(G.nodes()))
+    triangles = []
+    for node in sort_deg:
+        near = list(G.neighbors(node))
+        if len(near) > 1:
+            for i in range(len(near)-1):
+                neigh_i = near[i]
+                for j in range(i+1, len(near)-1):
+                    neigh_j = near[j]
+                    if degree[node] < degree[neigh_i] and degree[node] < degree[neigh_j]:
+                        if neigh_j in P.neighbors(neigh_i):
+                            triangles.append((node, neigh_i, neigh_j))
+    return triangles
 
+
+triangles = triangles_discover(P)
+print(triangles)
+
+triangles_count = len(triangles_discover(P))
+print(triangles_count)
 
 
 
