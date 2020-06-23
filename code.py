@@ -4,6 +4,8 @@ import networkx as nx
 from random import random
 from random import randrange
 import matplotlib.pyplot as plt
+from datetime import datetime
+import timeit
 
 
 # open data
@@ -113,42 +115,71 @@ R_weight = graph_builder(prov_sort, lats, longs, dist_max=0.08, weight=True)
 # plt.savefig("/home/noe/Università/in_corso/Algoritmi/APAD-project/mygraph.png")
 
 # counting triangles
-def sorted_degree(nodes):
-    """It calculates the degree for each node
+def sorted_degree(G):
+    """Given a graph G, it calculates the degree for each node
     and it returns a list of nodes sorted by degree
     """
+    nodes = list(G.nodes())
     deg = {}
     for n in nodes:
-        deg[n] = len(P[n])
+        deg[n] = len(G[n])
     return deg, sorted(deg, key=deg.get)
 
+def pass_i(v, w, degree):
+    """Check if the degree of v is less than the degree of w
+    if are equal check which node is smaller alphabetically """
+    return degree[v] < degree[w] or (degree[v] == degree[w] and v < w)
+
+def pass_j(v, u, degree):
+    """Check if the degree of v is less than the degree of u
+    if are equal check which node is smaller alphabetically """
+    return degree[v] < degree[u] or (degree[v] == degree[u] and v < u)
+
 # print(sort_deg, degree)
+
 def triangles_discover(G):
     """Given a graph G, this function returns the list of triangles
     """
-    degree, sort_deg = sorted_degree(list(G.nodes()))
+    degree, sort_deg = sorted_degree(G)
     triangles = []
     for node in sort_deg:
         near = list(G.neighbors(node))
         if len(near) > 1:
             for i in range(len(near)-1):
-                neigh_i = near[i]
-                for j in range(i+1, len(near)-1):
-                    neigh_j = near[j]
-                    if degree[node] < degree[neigh_i] and degree[node] < degree[neigh_j]:
-                        if neigh_j in G.neighbors(neigh_i):
-                            triangles.append((node, neigh_i, neigh_j))
+                if pass_i(node, near[i], degree):
+                    for j in range(i+1, len(near)):
+                        if pass_j(node, near[j], degree) and near[j] in G.neighbors(near[j]):
+                            triangles.append((node, near[i], near[j]))
     return triangles
 
 
-triangles = triangles_discover(P)
-print(triangles)
-
+triangles_list = triangles_discover(P)
+print(triangles_list)
 triangles_count = len(triangles_discover(P))
 print(triangles_count)
 
+start = datetime.now()
+triangles_discover(P)
+print(datetime.now() - start)
+
+start = datetime.now()
+sum(nx.triangles(P).values())/3
+print(datetime.now() - start)
 
 
+# TOY EXAMPLE
+g = nx.complete_graph(5)
+# nx.draw_circular(g, with_labels=True)
+# plt.savefig("/home/noe/Università/in_corso/Algoritmi/APAD-project/toy_count_triangle.png")
+
+# print(g.nodes())
+start = datetime.now()
+triangles_discover(g)
+print(datetime.now() - start)
+
+start = datetime.now()
+sum(nx.triangles(g).values())/3
+print(datetime.now() - start)
 
 
 
