@@ -59,14 +59,16 @@ P = graph_builder(prov_sort, lats, longs, dist_max=0.8)
 # print(len(P.edges()))
 
 def generate_x():
-    """Random generator for latitude"""
+    """Random generator for latitude
+    """
     while True:
         r = randrange(30, 49)
         eps = random()
         yield r+eps
 
 def generate_y():
-    """Random generator for longitude"""
+    """Random generator for longitude
+    """
     while True:
         r = randrange(10, 19)
         eps = random()
@@ -77,7 +79,8 @@ def random_graph(n):
     - a list of nodes with length n;
     - a dictionary where each node (key) is associated to a random latitude;
     - a dictionary where each node (key) is associated to a random longitude;
-    The function exploits two generator for latitude and longitude"""
+    The function exploits two generator for latitude and longitude
+    """
     node_list = []
     lat = {}
     long = {}
