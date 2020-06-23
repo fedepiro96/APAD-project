@@ -3,10 +3,7 @@ import json
 import networkx as nx
 from random import random
 from random import randrange
-import matplotlib.pyplot as plt
 from datetime import datetime
-import timeit
-
 
 # open data
 with open('/home/noe/Università/in_corso/Algoritmi/APAD-project/dati/dati-json/dpc-covid19-ita-province.json') as f:
@@ -160,7 +157,6 @@ print(datetime.now() - start)
 start = datetime.now()
 sum(nx.triangles(P).values())/3
 print(datetime.now() - start)
-
 
 # TOY EXAMPLE
 g = nx.complete_graph(5)
