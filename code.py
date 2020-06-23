@@ -125,16 +125,11 @@ def sorted_degree(G):
         deg[n] = len(G[n])
     return deg, sorted(deg, key=deg.get)
 
-def pass_i(v, w, degree):
+def passes(v, w, degree):
     """Check if the degree of v is less than the degree of w
-    if are equal check which node is smaller alphabetically """
+    if are equal check which node is smaller alphabetically
+    """
     return degree[v] < degree[w] or (degree[v] == degree[w] and v < w)
-
-def pass_j(v, u, degree):
-    """Check if the degree of v is less than the degree of u
-    if are equal check which node is smaller alphabetically """
-    return degree[v] < degree[u] or (degree[v] == degree[u] and v < u)
-
 # print(sort_deg, degree)
 
 def triangles_discover(G):
@@ -146,9 +141,9 @@ def triangles_discover(G):
         near = list(G.neighbors(node))
         if len(near) > 1:
             for i in range(len(near)-1):
-                if pass_i(node, near[i], degree):
+                if passes(node, near[i], degree):
                     for j in range(i+1, len(near)):
-                        if pass_j(node, near[j], degree) and near[j] in G.neighbors(near[j]):
+                        if passes(node, near[j], degree) and near[j] in G.neighbors(near[j]):
                             triangles.append((node, near[i], near[j]))
     return triangles
 
