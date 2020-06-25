@@ -228,13 +228,15 @@ print(triangles_count_R)
 ####Centralities:
 ####Eccentricity
 
-
-    
+nx.node_connected_component(P, "FI")
+P.graph['largest_cc'] = max(nx.connected_components(P), key=len)
+R.graph['largest_cc'] = max(nx.connected_components(R), key=len)
+   
 def ecc(graph, start):
     """Given a graph and a vertex v of the graph, it returns the eccentricity 
     of v
     """
-    if nx.is_connected(graph):
+    if start in P.graph['largest_cc']:
         queue = deque([start])
         level = {start: 0}
         while queue:
@@ -255,7 +257,7 @@ nx.set_node_attributes(R, None, "eccentricity")
 for node in list(P.nodes):
     P.nodes[node]["eccentricity"] = ecc(graph = P, start = node)
     R.nodes[node]["eccentricity"] = ecc(graph = R, start = node)
-print(nx.is_connected(P))
+
 
 
 
