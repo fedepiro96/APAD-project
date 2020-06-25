@@ -4,19 +4,28 @@ import networkx as nx
 from random import random
 from random import randrange
 from datetime import datetime
+from collections import deque
 
 # open data
 with open('/home/noe/Università/in_corso/Algoritmi/APAD-project/dati/dati-json/dpc-covid19-ita-province.json') as f:
     d = json.load(f)
 
+today = d[len(d)-1].get("data")
+begin = len(d)-1
+while d[begin].get("data") == today:
+    begin -= 1
+newd = d[begin:]
+
+# print(newd)
+# print(len(d))
+
 # preparing data to build the graph
 lats = {}
 longs = {}
-for record in d:                                                # for each observation
-    if record['lat'] != 0 and record['long'] != 0:              # drop the wrong observation (lat or long = 0)
-        if record['sigla_provincia'] not in lats.keys():        # store the name of the city and it latitude
-            lats[record['sigla_provincia']] = record['lat']     # and longitude in two dictionaries: lats e longs
-            longs[record['sigla_provincia']] = record['long']
+for record in newd:                                             # for each observation
+    if record['lat'] != 0:                                      # drop the wrong observation (lat or long = 0)
+        lats[record['sigla_provincia']] = record['lat']         # store the name of the city and it latitude
+        longs[record['sigla_provincia']] = record['long']       # and longitude in two dictionaries: lats e longs
 
 # sort the list of cities by its latitude
 prov_sort = sorted(lats, key=lats.get)
@@ -122,6 +131,8 @@ def sorted_degree(G):
         deg[n] = len(G[n])
     return deg, sorted(deg, key=deg.get)
 
+# print(sorted_degree(P))
+
 def passes(v, w, degree):
     """Check if the degree of v is less than the degree of w
     if are equal check which node is smaller alphabetically
@@ -140,8 +151,8 @@ def triangles_discover(G):
             for i in range(len(near)-1):
                 if passes(node, near[i], degree):
                     for j in range(i+1, len(near)):
-                        if passes(node, near[j], degree) and near[j] in G.neighbors(near[j]):
-                            triangles.append((node, near[i], near[j]))
+                        if passes(node, near[j], degree) and near[j] in G.neighbors(near[i]):
+                                triangles.append((node, near[i], near[j]))
     return triangles
 
 
@@ -171,6 +182,45 @@ print(datetime.now() - start)
 start = datetime.now()
 sum(nx.triangles(g).values())/3
 print(datetime.now() - start)
+
+def ecc(graph, start):
+    """Given a graph and a vertex v of the graph, it returns the eccentricity
+    of v
+    """
+    if start in P.graph['largest_cc']:
+        queue = deque([start])
+        level = {start: 0}
+        while queue:
+            v = queue.popleft()
+            for n in graph[v]:
+                if n not in level:
+                    queue.append(n)
+                    level[n] = level[v] + 1
+        maxlev = max(level.values())
+        return maxlev
+    else:
+        return float('inf')
+
+
+P.graph['largest_cc'] = max(nx.connected_components(P), key=len)
+p = nx.subgraph(P, P.graph['largest_cc'])
+R.graph['largest_cc'] = max(nx.connected_components(R), key=len)
+r = nx.subgraph(R, R.graph['largest_cc'])
+
+nx.set_node_attributes(p, None, "eccentricity")
+nx.set_node_attributes(r, None, "eccentricity")
+
+for node in list(p.nodes()):
+    p.nodes[node]["eccentricity"] = ecc(graph=p, start=node)
+
+for node in list(r.nodes()):
+    r.nodes[node]["eccentricity"] = ecc(graph=r, start=node)
+
+
+
+
+
+
 
 
 
