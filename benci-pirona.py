@@ -34,9 +34,9 @@ def set_nodes(data = newd):
         if data[i].get("lat") != 0: 
             G.add_node(data[i]["sigla_provincia"], lat = data[i]["lat"], 
                        long = data[i]["long"])
-    return
+    return G
 
-P = set_nodes(data)
+P = set_nodes(data = newd)
 #%timeit (set_nodes(P))
 #90.7 µs ± 2.93 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 
@@ -229,25 +229,25 @@ print(triangles_count_R)
 ####Eccentricity
 
 
-
-
+    
 def ecc(graph, start):
     """Given a graph and a vertex v of the graph, it returns the eccentricity 
     of v
     """
-    queue = deque([start])
-    level = {start: 0}
-    while queue:
-        v = queue.popleft()
-        for n in graph[v]:
-            if n not in level:            
-                queue.append(n)
-                level[n] = level[v] + 1
-    maxlev = max(level.values())
-    if maxlev > 0:
+    if nx.is_connected(graph):
+        queue = deque([start])
+        level = {start: 0}
+        while queue:
+            v = queue.popleft()
+            for n in graph[v]:
+                if n not in level:            
+                    queue.append(n)
+                    level[n] = level[v] + 1
+        maxlev = max(level.values())
         return maxlev
     else:
-        return None
+        return float('inf')
+   
     
     
 nx.set_node_attributes(P, None, "eccentricity")
