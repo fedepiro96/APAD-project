@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels
-import graphics
 with open('G:/Algoritmi e programmazione/Progetto/Dati/dpc-covid19-ita-province.json') as f:
          d = json.load(f) 
 
@@ -99,11 +98,89 @@ dailyincr[list(myMI.loc['Toscana'].index)].plot()
 dailyincr[list(myMI.loc['Lombardia'].index)].plot()
 dailyincr[list(myMI.loc['Sardegna'].index)].plot()
 
+
+
 #Daily increase for Italy
 dailyincr.sum(axis = 1).plot()
-autocorrelation_plot(dailyincr.sum(axis = 1))
 
+from pandas.plotting import autocorrelation_plot
+autocorrelation_plot(dailyincr.sum(axis = 1))
+#dashed 99%, continous 95%
 
 from statsmodels.graphics.tsaplots import plot_acf
 #ACF plot for totals
 plot_acf(dailyincr.sum(axis = 1), lags=20, unbiased = True, title = 'Italy Autocorrelation')
+
+
+
+##############################################################################
+
+with open('G:/Algoritmi e programmazione/Progetto/Dati/dpc-covid19-ita-regioni.json') as f:
+         d = json.load(f) 
+
+d2 = pd.DataFrame(d)
+
+datanoe = '2020-06-17T17:00:00'
+
+row = len(d)-1
+while d[row]['data'] != datanoe:
+    row -= 1
+d = d[:row+1]
+
+#Creating a list of unique 'province', 'regioni', lat' and 'long' 
+
+columns = ['data', 'denominazione_regione', 'deceduti', 'dimessi_guariti', 
+           'isolamento_domiciliare', 'nuovi_positivi', 'ricoverati_con_sintomi',
+           'tamponi', 'terapia_intensiva', 'totale_casi', 'totale_ospedalizzati',
+           'totale_positivi', 'variazione_totale_positivi']
+df = pd.DataFrame(index = range(len(d)), columns = columns)
+for i in range(len(d)):
+    riga = {}
+    for n in range(len(columns)):
+        riga[columns[n]] = d[i][columns[n]]
+    df.loc[i] = riga 
+    
+   
+df.data = pd.DatetimeIndex(df.data)
+dates = list(set(df.data))
+dates.sort()
+regions = list(set(df.denominazione_regione))
+regions.sort()
+df.set_index(['data', 'denominazione_regione'], inplace = True) 
+df = df.sort_index()
+
+df.loc[dates[40]]['tamponi']
+df.loc[(dates[40], 'Toscana')]
+df.loc[dates[40:45]]['tamponi']
+df.loc['2020-06-05 17:00:00']['tamponi']
+
+#Division by zero problem
+letalità = list(np.repeat(np.nan, len(df.index)))
+for i in range(len(df.index)):
+    if df.iloc[i]['totale_casi'] != 0:
+        letalità[i] = df.iloc[i]['deceduti'] / df.iloc[i]['totale_casi']
+df['letalità'] = letalità
+
+
+letal = {}
+for d in dates:
+    letal[d] = []
+for i in df.index:
+    letal[i[0]].append(df.loc[i]['letalità'])
+letal = pd.DataFrame(letal).transpose()
+letal.columns = regions
+
+import matplotlib as mpl
+%matplotlib inline
+letal.plot(legend = False)
+plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+
+
+nuovi_deceduti = list(np.repeat(np.nan, 21))
+for i in range(21, len(df.index)):
+    nuovi_deceduti.append(df.iloc[i]['deceduti'] - df.iloc[i-21]['deceduti'])
+
+df['nuovi_deceduti'] = nuovi_deceduti
+
+
+    
