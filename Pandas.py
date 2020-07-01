@@ -172,15 +172,16 @@ letal.columns = regions
 
 import matplotlib as mpl
 %matplotlib inline
-letal.plot(legend = False)
+letal.plot(legend = False, colormap='gist_rainbow')
 plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
 
 
-nuovi_deceduti = list(np.repeat(np.nan, 21))
-for i in range(21, len(df.index)):
+nuovi_deceduti = list(np.repeat(np.nan, len(regions)))
+for i in range(len(regions), len(df.index)):
     nuovi_deceduti.append(df.iloc[i]['deceduti'] - df.iloc[i-21]['deceduti'])
-
 df['nuovi_deceduti'] = nuovi_deceduti
 
-
-    
+boxplot = df.boxplot(column = 'nuovi_positivi', by = 'denominazione_regione', rot = 90)
+a = df.loc[dates[40]]
+a.plot(x = 'dimessi_guariti', y = 'ricoverati_con_sintomi', style = '.', logy = True)
+df.loc[dates[40]]['dimessi_guariti']
