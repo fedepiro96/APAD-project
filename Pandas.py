@@ -2,7 +2,7 @@ import json
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import statsmodels
+from datetime import date, datetime
 with open('G:/Algoritmi e programmazione/Progetto/Dati/dpc-covid19-ita-province.json') as f:
          d = json.load(f) 
 
@@ -26,6 +26,9 @@ for row in d1.index:
 d1 = d1.drop(toremove) #dropping fake rows
 d1 = d1.reset_index(drop = True) #updating indexes
 
+d1['data'] = pd.to_datetime(d1['data']).dt.date #alcune ore differiscono da df regione
+
+
 #Creating a list of unique 'province', 'regioni', lat' and 'long' 
 row = 0
 day0 = d1["data"][0]
@@ -33,14 +36,17 @@ column_prov = []
 column_reg = []
 column_lat = []
 column_long = []
+column_dates = []
 while d1["data"][row] == day0:
     column_prov.append(d1["sigla_provincia"][row])
     column_reg.append(d1["denominazione_regione"][row])
     column_lat.append(d1["lat"][row])
     column_long.append(d1["long"][row])
+    column_dates.append(d1['data'][row])
     row += 1
 
-myMI = pd.DataFrame({'regioni':column_reg, 'province': column_prov, 
+column_dates = pd.DatetimeIndex(column_dates)
+myMI = pd.DataFrame({'regioni':column_reg, 'province': column_prov,  'date': column_dates,
                      'lat':column_lat, 'long':column_long})
 #Creating a list of unique dates
 dates = []
@@ -48,10 +54,10 @@ for i in range(0, len(d1.index),len(column_prov)):
     dates.append(d1["data"][i])
     myMI[d1["data"][i]] = np.nan
 
-myMI.set_index(['regioni', 'province'], inplace = True) 
+myMI.set_index(['regioni', 'province', 'date'], inplace = True) 
 myMI = myMI.sort_index()
 
-myMI.iloc[20:30][dates[10:12]]
+myMI.iloc[20:30]
 myMI.loc[('Toscana', 'FI')][dates[80:85]]
 
 #Creating a TimeSeries
@@ -118,14 +124,30 @@ plot_acf(dailyincr.sum(axis = 1), lags=20, unbiased = True, title = 'Italy Autoc
 with open('G:/Algoritmi e programmazione/Progetto/Dati/dpc-covid19-ita-regioni.json') as f:
          d = json.load(f) 
 
-d2 = pd.DataFrame(d)
 
 datanoe = '2020-06-17T17:00:00'
-
 row = len(d)-1
 while d[row]['data'] != datanoe:
     row -= 1
 d = d[:row+1]
+d2 = pd.DataFrame(d)
+
+d2['data'] = pd.to_datetime(d2['data']).dt.date
+
+cols_1 = ['codice_provincia', 'data', 'denominazione_provincia', 'denominazione_regione', 'lat', 'long', 'sigla_provincia']
+mergione = pd.merge(d1[cols_1], d2, on = ['denominazione_regione', 'data'], suffixes = ["_prov", "_reg"])
+mergione.set_index(['denominazione_regione','sigla_provincia', 'data'], inplace = True) #faccio index
+mergione.sort_index(inplace=True)
+mergione.index
+mergione.shape
+d1.shape
+d2.shape
+mergione.columns
+
+mergione.iloc(1)
+mergione.data
+
+
 
 #Creating a list of unique 'province', 'regioni', lat' and 'long' 
 
@@ -183,5 +205,6 @@ df['nuovi_deceduti'] = nuovi_deceduti
 
 boxplot = df.boxplot(column = 'nuovi_positivi', by = 'denominazione_regione', rot = 90)
 a = df.loc[dates[40]]
-a.plot(x = 'dimessi_guariti', y = 'ricoverati_con_sintomi', style = '.', logy = True)
-df.loc[dates[40]]['dimessi_guariti']
+a.plot(x = 'dimessi_guariti', y = 'ricoverati_con_sintomi', style = '.', logy = True,
+       xlim = (0,15000), ylim = (10, 15000))
+df.loc[dates[40]]['ricoverati_con_sintomi']
