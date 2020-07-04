@@ -45,6 +45,8 @@ while d1["data"][row] == day0:
     column_dates.append(d1['data'][row])
     row += 1
 
+MI = d1.set_index(['denominazione_regione', 'sigla_provincia', 'data'])
+MI.sort_index(inplace = True)
 column_dates = pd.DatetimeIndex(column_dates)
 myMI = pd.DataFrame({'regioni':column_reg, 'province': column_prov,  'date': column_dates,
                      'lat':column_lat, 'long':column_long})
@@ -134,6 +136,10 @@ d2 = pd.DataFrame(d)
 
 d2['data'] = pd.to_datetime(d2['data']).dt.date
 
+d2.set_index(['data', 'denominazione_regione'], inplace =True)
+d2.sort_index(inplace = True)
+d2.loc['2020-06-16']['tamponi']
+
 cols_1 = ['codice_provincia', 'data', 'denominazione_provincia', 'denominazione_regione', 'lat', 'long', 'sigla_provincia']
 mergione = pd.merge(d1[cols_1], d2, on = ['denominazione_regione', 'data'], suffixes = ["_prov", "_reg"])
 mergione.set_index(['denominazione_regione','sigla_provincia', 'data'], inplace = True) #faccio index
@@ -148,6 +154,7 @@ mergione.iloc(1)
 mergione.data
 
 
+d2
 
 #Creating a list of unique 'province', 'regioni', lat' and 'long' 
 
