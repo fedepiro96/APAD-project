@@ -2,4 +2,7 @@ venv-project/
 dati/
 .ipynb_checkpoints/
 __pycache__/
-
+Limiti/
+Limiti01012018/
+province_border.json
+region_border.json
