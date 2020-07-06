@@ -135,7 +135,32 @@ d = d[:row+1]
 d2 = pd.DataFrame(d)
 
 d2['data'] = pd.to_datetime(d2['data']).dt.date
+b = pd.to_datetime(['2020-02-01', '2020-03-01','2020-04-01', '2020-05-01', '2020-06-01'])
+l = range(1,4)
+d2['new'] = pd.cut(d2['data'], bins=b, labels=l, include_lowest=True)
+d2.pivot_table('terapia_intensiva', index='denominazione_regione', columns='data')
+periodo = pd.cut(d2['data'], ['2020-03-01', '2020-04-01', '2020-05-01', '2020-06-01'])
+mese = list(pd.DatetimeIndex(d2['data']).month)
+monthsdic = {2: '2;Febbraio', 3: '3;Marzo', 4: '4;Aprile', 5:'5;Maggio', 6:'6;Giugno'}
+mese = [ monthsdic[n] for n in mese ]
+d2['mese'] = mese
+zone = ['1;Nord-Ovest', '2;Nord-Est', '3;Centro', '4;Sud', '5;Isole']
 
+areageodic = {'Abruzzo': zone[2], 'Basilicata': zone[3], 'Calabria': zone[3], 
+              'Campania':zone[3], 'Emilia-Romagna':zone[1], 
+              'Friuli Venezia Giulia':zone[1], 'Lazio': zone[2], 
+              'Liguria':zone[0], 'Lombardia':zone[0], 
+              'Marche': zone[2], 'Molise':zone[3], 'P.A. Bolzano':zone[1], 
+              'P.A. Trento':zone[1], 'Piemonte': zone[0], 'Puglia':zone[3],
+              'Sardegna':zone[4], 'Sicilia':zone[4], 'Toscana': zone[2],
+              'Umbria': zone[2], 'Valle d\'Aosta':zone[0], 
+              'Veneto':zone[1]}
+area_geografica = [ areageodic[n] for n in d2.denominazione_regione ]
+d2['area_geografica'] = area_geografica
+d2.pivot_table('terapia_intensiva', index='area_geografica', columns='mese')
+
+tamponi_qcut = pd.qcut(d2['tamponi'], 3, labels = ['Pochi', 'Normali', 'Tanti'])
+d2.pivot_table('totale_casi', index = 'area_geografica', columns = 'tamponi_qcut')
 d2.set_index(['data', 'denominazione_regione'], inplace =True)
 d2.sort_index(inplace = True)
 d2.loc['2020-06-16']['tamponi']
