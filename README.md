@@ -15,7 +15,8 @@ with open('dpc-covid19-ita-province.json') as f:
 
          d = json.load(f)
 
-## Building the graphs: file benci-pirona.py https://github.com/fedepiro96/APAD-project/blob/master/benci-pirona.py
+## Building the graphs
+Next steps are reported in the file benci-pirona.py https://github.com/fedepiro96/APAD-project/blob/master/benci-pirona.py
 
 - Build the graph of provinces P using NetworkX.
   - Each node corresponds to a city and two cities a and b are connected by an edge if the following holds: if x,y is the position of a, then b is in position z,w with z in [x-d,x+d] and w in [y-d, y+d], with d=0.8. The graph is symmetric. Use the latitude and longitude information available in the files to get the position of the cities. This task can be done in several ways. Use the one you think is more efficient.
@@ -30,7 +31,8 @@ with open('dpc-covid19-ita-province.json') as f:
   - apply them both to P and R
 - Prepare slides (file benci-pirona.pdf)(the presentation will last 15 minutes per person) explaining the chosen algorithms, your implementations, and their applications to a toy example.
 
-## Pandas: file benci-pirona.ipynb https://github.com/fedepiro96/APAD-project/blob/master/benci-pirona.ipynb
+## Pandas
+Next steps are reported in the notebook benci-pirona.ipynb https://github.com/fedepiro96/APAD-project/blob/master/benci-pirona.ipynb
 
 Until now we have only used the name of the cities and their corresponding position. We now use the remaining data.
 
