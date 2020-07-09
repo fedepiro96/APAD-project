@@ -1,0 +1,8 @@
+.idea/
+.ipynb_checkpoints/
+Limiti01012018/
+dati/
+province_border.json
+region_border.json
+venv-project/
+__pycache__/
