@@ -51,7 +51,7 @@ Città Metropolitana di
 VENEZIA",VEN,853.338
 "GE
 Città Metropolitana di
-GENOVA",LIG,841.18
+GENOVA",LIG,841.180
 "LE
 Lecce",PUG,795.134
 "CS
@@ -79,7 +79,7 @@ REGGIO CALABRIA",CAL,548.009
 "PV
 Pavia",LOM,545.888
 "TN
-Trento",TAA,541.098
+Trento",TRE,541.098
 "RE
 Reggio Emilia",EMR,531.891
 "BZ
@@ -95,7 +95,7 @@ Ancona",MAR,471.228
 "PR
 Parma",EMR,451.631
 "AG
-Agrigento[4]",SIC,434.87
+Agrigento[4]",SIC,434.870
 "CA
 Città Metropolitana di
 CAGLIARI",SAR,431.038
@@ -126,7 +126,7 @@ Chieti",ABR,385.588
 "NO
 Novara",PIE,369.018
 "PZ
-Potenza",BAS,364.96
+Potenza",BAS,364.960
 "CR
 Cremona",LOM,358.955
 "PU
@@ -142,7 +142,7 @@ Arezzo",TOS,342.654
 "RN
 Rimini",EMR,339.017
 "LC
-Lecco",LOM,337.38
+Lecco",LOM,337.380
 "LI
 Livorno",TOS,334.832
 "RG
@@ -150,7 +150,7 @@ Ragusa[4]",SIC,320.893
 "PE
 Pescara",ABR,318.909
 "VT
-Viterbo",LAZ,317.03
+Viterbo",LAZ,317.030
 "MC
 Macerata",MAR,314.178
 "PN
@@ -186,17 +186,17 @@ Grosseto",TOS,221.629
 "CB
 Campobasso",MOL,221.238
 "SP
-La Spezia",LIG,219.556
+La Spezia",LIG,219.560
 "AT
 Asti",PIE,214.638
 "IM
-Imperia",LIG,213.84
+Imperia",LIG,213.840
 "NU
-Nuoro",SAR,208.55
+Nuoro",SAR,208.550
 "AP
 Ascoli Piceno",MAR,207.179
 "BL
-Belluno",VEN,202.95
+Belluno",VEN,202.950
 "MT
 Matera",BAS,197.909
 "MS
@@ -206,9 +206,9 @@ Sondrio",LOM,181.095
 "BI
 Biella",PIE,175.585
 "KR
-Crotone",CAL,174.98
+Crotone",CAL,174.980
 "FM
-Fermo",MAR,173.8
+Fermo",MAR,173.800
 "VC
 Vercelli",PIE,170.911
 "EN
