@@ -240,3 +240,45 @@ a = df.loc[dates[40]]
 a.plot(x = 'dimessi_guariti', y = 'ricoverati_con_sintomi', style = '.', logy = True,
        xlim = (0,15000), ylim = (10, 15000))
 df.loc[dates[40]]['ricoverati_con_sintomi']
+
+
+
+cols = ['dimessi_guariti', 'deceduti', 'totale_casi', 'tamponi', 'casi_testati']
+
+dailyincr = pd.DataFrame(region[['dimessi_guariti', 'deceduti', 'totale_casi', 
+                                 'tamponi', 'casi_testati']], index=region.index, columns = cols)
+
+    
+region = d2
+n = len(region.denominazione_regione.unique())
+for var in cols:
+    for j in range(n):
+        for i in range(j, dailyincr.shape[0], n):
+            if i < n:
+                dailyincr[var].values[i] = region[var].values[i] 
+            else:
+                diff = region[var].values[i] - region[var].values[i-n]
+                if diff < 0:                                            # this 'if' checks for errors:
+                    region.loc[i, var] = region.loc[i-n, var]           # some frequency of the cumulative 
+                else:                                                   # variables resulted negative
+                    dailyincr[var].values[i] = diff
+dailyincr.describe
+dailyincr['denominazione_regione'] = region.denominazione_regione
+dailyincr[dailyincr['denominazione_regione']=='Marche']['deceduti']
+
+
+
+n = len(region.denominazione_regione.unique())
+for var in cols:
+    for j in range(n):
+        for i in range(j, dailyincr.shape[0]-n, n):
+            if i <= n:
+                dailyincr[var].values[i] = region[var].values[i] 
+            else:
+                diff = region[var].values[i] - region[var].values[i-n]
+                if diff < 0:                                            # this 'if' checks for errors:
+                    region.loc[i, var] = region.loc[i-n, var]           # some frequency of the cumulative 
+                    dailyincr[var].values[i] = 0                        # variables resulted negative
+                else:                                                   
+                    dailyincr[var].values[i] = diff
+dailyincr.describe()
