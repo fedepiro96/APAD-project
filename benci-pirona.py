@@ -1,14 +1,17 @@
 import json
 import networkx as nx
 import numpy as np
+import matplotlib.pyplot as plt
 import timeit 
 from random import randrange
 import random 
 from collections import deque
 
-with open('G:/Algoritmi e programmazione/Progetto/APAD-project/dpc-covid19-ita-province.json') as f:
+with open('./Data/dpc-covid19-ita-province.json') as f:
          d = json.load(f) 
 
+
+#removing false records
 today = d[len(d)-1].get("data")
 
 begin = len(d)-1
@@ -40,18 +43,11 @@ P = set_nodes(data = newd)
 #%timeit (set_nodes(P))
 #90.7 µs ± 2.93 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 
-
-def nearlat(v, w, d = .8):
-    """given two nodes and a distance d, it returns True if nodes latitude 
-    differs less than d
+def nearbyatt(v, w, att, d = .8):
+    """given two nodes, a distance d and an attribute att, it returns True if 
+    nodes attribute differs less than d
     """
-    return abs(v["lat"] - w["lat"]) < d
-
-def nearlong(v, w, d = .8):
-    """given two nodes and a distance d, it returns True if nodes longitude 
-    differs less than d
-    """
-    return abs(v["long"] - w["long"]) < d
+    return abs(v[att] - w[att]) < d
 
 def ordered_attr(G = P, att = "lat"):
     """Given a graph and a node attribute, it returns a list of nodes in 
@@ -60,8 +56,8 @@ def ordered_attr(G = P, att = "lat"):
     dic = nx.get_node_attributes(G, att) #Ottengo dic con chiavi prov, values lat
     sort = sorted(dic, key= dic.get) #Province ordinate in base a latitudine
     return sort
-#%timeit (sorted(dic, key= dic.get))
-#12.4 µs ± 132 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+#%timeit ordered_attr(P, "lat")
+#61.8 µs ± 3.13 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 
 sortlat = ordered_attr(P, "lat")
 
@@ -73,8 +69,8 @@ def set_edges(G = P, ordered = sortlat, dist = .8):
     n_1 = len(ordered) -1
     i, j = 0,1
     while i < n_1:
-        if nearlat(G.nodes[ordered[i]], G.nodes[ordered[j]], d = dist):
-            if nearlong(G.nodes[ordered[i]], G.nodes[ordered[j]], d = dist):
+        if nearbyatt(G.nodes[ordered[i]], G.nodes[ordered[j]], d = dist, att = 'lat'):
+            if nearbyatt(G.nodes[ordered[i]], G.nodes[ordered[j]], d = dist, att = 'long'):
                 G.add_edge(ordered[i], ordered[j])
             if j < n_1:
                 j += 1
@@ -86,43 +82,100 @@ def set_edges(G = P, ordered = sortlat, dist = .8):
             j = i+1
     return
 
-#%timeit (set_edges(G))
-#4.53 ms ± 523 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+#%timeit (set_edges(P))
+#4.66 ms ± 270 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 set_edges(P)    
 P.number_of_edges()
 
+fig, ax = plt.subplots(1,1, figsize = (10, 10))
+nx.draw(P, with_labels=True, node_size = 40, font_size = 10, ax = ax )
+#plt.savefig('P Graph')
 
 def set_edges2(G = P, dist = .8):
-    """A trivial version of set_edges fuunction, to add edges to the graph G
+    """Given a Graph, a list of (ordered) nodes and a distance dist, it adds 
+    edges to the Graph if two nodes latitude and longitude differ less than 
+    dist. An edge between v and w is added if w is near to v by latitude and by
+    longitude
+    """  
+    sortlat = ordered_attr(G, "lat")
+    sortlong = ordered_attr(G, "long")
+    for n in G.nodes:
+        neigh_lat = find_neigh(G, nodelist = sortlat, node = n, dist = dist, att = 'lat')
+        neigh_long = find_neigh(G, nodelist = sortlong, node = n, dist = dist, att = 'long')
+        intersec = intersection(neigh_lat, neigh_long)
+        for neigh in intersec:
+            G.add_edge(n, neigh)
+    return 
+            
+            
+        
+def find_neigh(G, nodelist, node, dist, att):
+    """Given a Graph, one node of it and a nodal attribute, it returns a list
+    of nodes near to the node by attribute"""
+    i = nodelist.index(node)
+    j, k =  i-1, i+1
+    n = len(nodelist) - 1 
+    nbs = []
+    while j >= 0 and nearbyatt(G.nodes[nodelist[i]], G.nodes[nodelist[j]], d = dist, att = att ):
+        nbs.append(nodelist[j])
+        j -= 1
+    while k <= n and nearbyatt(G.nodes[nodelist[i]], G.nodes[nodelist[k]], d = dist, att = att):
+        nbs.append(nodelist[k])
+        k += 1
+    return nbs
+    
+def intersection(l1, l2):
+    """Given two lists, it returns a list with an intersection of the elements 
+    of them, using a similar method to the sorting in MergeSort
+    """
+    l1.sort()
+    l2.sort()
+    i = j = 0
+    inter = []
+    while i < len(l1) and j < len(l2):
+        if l1[i] < l2[j]:
+            i += 1
+        elif l1[i] > l2[j]:
+            j += 1
+        else:
+            inter.append(l1[i])
+            i += 1
+            j += 1
+    return inter
+
+PP = set_nodes(data = newd)
+set_edges2(PP)
+len(PP.edges)
+#% timeit set_edges2(PP)
+#10.7 ms ± 359 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+
+
+
+def set_edges3(G = P, dist = .8):
+    """A trivial version of set_edges function, to add edges to the graph G
     """
     nodes = list(G.nodes)
     for i in range(len(nodes)-1):
         for j in range(i+1, len(nodes)):
-            if nearlat(G.nodes[nodes[i]], G.nodes[nodes[j]], dist) and  nearlong(G.nodes[nodes[i]], G.nodes[nodes[j]], dist):
+            if nearbyatt(G.nodes[nodes[i]], G.nodes[nodes[j]], att = 'lat', d = dist) and  nearbyatt(G.nodes[nodes[i]], G.nodes[nodes[j]], att = 'long', d = dist):
                 G.add_edge(nodes[i], nodes[j])
     return
 
-#%timeit (set_edges2(G)) 
-#11.3 ms ± 1.18 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+PPP = set_nodes(data = newd)
+set_edges3(PPP)
+len(PPP.edges)
+#%timeit (set_edges3(PPP)) 
+#12 ms ± 965 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
 
 
-
-def generate_x():
-    """Random generator for latitude
+def random_generator(lower, upper):
+    """Random generator for latitude and longitude
     """
-    while True:
-        r = randrange(30, 49)
-        eps = random.random()
-        yield r+eps
-
-def generate_y():
-    """Random generator for longitude
-    """
-    while True:
-        r = randrange(10, 19)
-        eps = random.random()
-        yield r+eps
+    while True: 
+        yield lower + random.random()*(upper - lower)
 
 
 
@@ -131,8 +184,8 @@ def random_graph(n):
     has three keys: "sigla_provincia", "lat" and "long".
     """
     node_list = []
-    x = generate_x()
-    y = generate_y()
+    x = random_generator(30,50)
+    y = random_generator(10,20)
     for i in range(n):
         node_list.append({"sigla_provincia": i, "lat": next(x), "long": next(y)})
     return node_list
@@ -141,18 +194,40 @@ n = 2000
 random.seed(1)
 random_data = random_graph(n)
 
-random_P = set_nodes(data = random_data)
-sortlat2 = ordered_attr(random_P, "lat")
-set_edges(random_P, sortlat2, dist = .8)
-len(random_P.edges)
+R = set_nodes(data = random_data)
+#%timeit set_nodes(data = random_data)
+#1.85 ms ± 78 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 
-random_R = set_nodes(data = random_data)
-set_edges(random_R, sortlat2, dist = .08)
-len(random_R.edges)
+sortlat2 = ordered_attr(R, "lat")
+set_edges(G = R, ordered = sortlat2, dist = .08)
+len(R.edges)
 
-R = set_nodes()
-set_edges(G = R, dist = .08)
+#%timeit ordered_attr(R, "lat")
+#1.33 ms ± 60.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+#%timeit set_edges(R, sortlat2, dist = .08)
+#66.8 ms ± 3.61 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
+
+nx.draw_random(R, node_size = 10)
+#plt.savefig('R graph')
+
+RR = set_nodes(data = random_data)
+set_edges2(RR, dist = .08)
+len(RR.edges)
+#%timeit set_edges2(RR)
+#2.72 s ± 114 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+RRR = set_nodes(data = random_data)
+set_edges3(RRR, dist = .08)
+#%timeit set_edges3(RRR)
+#3.75 s ± 89.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+
+#The cost of the function set_Edges and set_Edges2 should belong to the same 
+#Order of magnitude O(nlogn) because of the sorting cost. However set_Edges 
+#seems to perform faster than set_Edges2 according to timeit module.
+#The cost of the function set_Edges3 is instead O(n^2) because every node is 
+#compared to every other n-1 nodes
 
 def distance(v, w):
     """It returns the Euclidean Distance from node v to node w, based on their
@@ -173,6 +248,48 @@ def set_distances(G = P):
         
 set_distances(P)
 set_distances(R)
+
+#Drawing weighted Graph P
+pos = nx.layout.spring_layout(P)
+
+M = P.number_of_edges()
+fig, ax = plt.subplots(1,1, figsize = (10, 10))
+edge_colors = [d*1.5 for d in nx.get_edge_attributes(P,'distance').values()]
+edge_cmap=plt.cm.YlOrRd
+nodes = nx.draw_networkx_nodes(P, pos, node_size=20)
+nx.draw_networkx_labels(P, pos, font_size=8, font_family='sans-serif', ax = ax )
+edges = nx.draw_networkx_edges(P, pos, edge_color=edge_colors, 
+                               edge_cmap=edge_cmap,  
+                               width=2)
+
+sm = plt.cm.ScalarMappable(cmap=edge_cmap, norm=plt.Normalize(vmin = min(nx.get_edge_attributes(P,'distance').values()), vmax=max(nx.get_edge_attributes(P,'distance').values())) )
+
+sm._A = []
+plt.colorbar(sm)
+plt.axis('off')
+plt.show()
+#plt.savefig('P Weighted Graph')
+
+#Drawing Weighted Graph R
+pos = nx.layout.random_layout(R)
+
+M = R.number_of_edges()
+fig, ax = plt.subplots(1,1, figsize = (10, 10))
+edge_colors = [d*1.5 for d in nx.get_edge_attributes(R,'distance').values()]
+edge_cmap=plt.cm.YlOrRd
+nodes = nx.draw_networkx_nodes(R, pos, node_size=20)
+#nx.draw_networkx_labels(R, pos, font_size=8, font_family='sans-serif', ax = ax )
+edges = nx.draw_networkx_edges(R, pos, edge_color=edge_colors, 
+                               edge_cmap=edge_cmap,  
+                               width=2)
+
+sm = plt.cm.ScalarMappable(cmap=edge_cmap, norm=plt.Normalize(vmin = min(nx.get_edge_attributes(R,'distance').values()), vmax=max(nx.get_edge_attributes(R,'distance').values())) )
+
+sm._A = []
+plt.colorbar(sm)
+plt.axis('off')
+plt.show()
+#plt.savefig('R Weighted Graph')
 
 ####Global Indices and Structures:
 ####Counting Triangles
@@ -221,45 +338,58 @@ print(triangles_count_R)
 
 
 #%timeit (triangles_discover(P))
-#1.2 ms ± 97.5 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+#1.01 ms ± 51.5 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+#%timeit (triangles_discover(R))
+#4.52 ms ± 194 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
+#%timeit (triangles_discover(P))
+#1.11 ms ± 41.2 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+#%timeit (triangles_discover(R))
+#4.66 ms ± 186 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
 
 ####Centralities:
 ####Eccentricity
 
-nx.node_connected_component(P, "FI")
-P.graph['largest_cc'] = max(nx.connected_components(P), key=len)
-R.graph['largest_cc'] = max(nx.connected_components(R), key=len)
-   
-def ecc(graph, start):
+
+def ecc(start, graph):
     """Given a graph and a vertex v of the graph, it returns the eccentricity 
     of v
     """
-    if start in P.graph['largest_cc']:
-        queue = deque([start])
-        level = {start: 0}
-        while queue:
-            v = queue.popleft()
-            for n in graph[v]:
-                if n not in level:            
-                    queue.append(n)
-                    level[n] = level[v] + 1
-        maxlev = max(level.values())
-        return maxlev
-    else:
-        return float('inf')
+    level = {}
+    color = {}
+    for v in graph.nodes:
+        level[v] = float('inf')
+        color[v] = 'white'
+    queue = deque([start])
+    color[start] = 'no_white' 
+    level[start] = 0
+    while queue:
+        v = queue.popleft()
+        for n in graph[v]:
+            if color[n] == 'white':            
+                queue.append(n)
+                level[n] = level[v] + 1
+                color[n] = 'no_white'
+    maxlev = max(level.values())
+    return maxlev
+
    
+p = nx.subgraph(P, max(nx.connected_components(P), key=len))
+r = nx.subgraph(R, max(nx.connected_components(R), key=len))
+
+nx.set_node_attributes(p, None, "eccentricity")
+nx.set_node_attributes(r, None, "eccentricity")
+
+for node in list(p.nodes()):
+    p.nodes[node]["eccentricity"] = ecc(graph=p, start=node)
+
+for node in list(r.nodes()):
+    r.nodes[node]["eccentricity"] = ecc(graph=r, start=node)    
     
-    
-nx.set_node_attributes(P, None, "eccentricity")
-nx.set_node_attributes(R, None, "eccentricity")
-for node in list(P.nodes):
-    P.nodes[node]["eccentricity"] = ecc(graph = P, start = node)
-    R.nodes[node]["eccentricity"] = ecc(graph = R, start = node)
 
-
-
-
-
+#%timeit for node in list(p.nodes()): p.nodes[node]["eccentricity"] = ecc(graph=p, start=node)
+#63.3 ms ± 5.3 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+#%timeit for node in list(r.nodes()):r.nodes[node]["eccentricity"] = ecc(graph=r, start=node)   
+#236 µs ± 20.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 
