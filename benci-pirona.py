@@ -353,14 +353,21 @@ def ecc(start, graph):
     """Given a graph and a vertex v of the graph, it returns the eccentricity 
     of v
     """
+    level = {}
+    color = {}
+    for v in graph.nodes:
+        level[v] = float('inf')
+        color[v] = 'white'
     queue = deque([start])
-    level = {start: 0}
+    color[start] = 'no_white' 
+    level[start] = 0
     while queue:
         v = queue.popleft()
         for n in graph[v]:
-            if n not in level:            
+            if color[n] == 'white':            
                 queue.append(n)
                 level[n] = level[v] + 1
+                color[n] = 'no_white'
     maxlev = max(level.values())
     return maxlev
 
