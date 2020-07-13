@@ -196,44 +196,45 @@ def random_graph(n):
         node_list.append({"sigla_provincia": i, "lat": next(x), "long": next(y)})
     return node_list
 
+
 n = 2000
 random.seed(1)
 random_data = random_graph(n)
 
 R = set_nodes(data = random_data)
-#%timeit set_nodes(data = random_data)
-#1.85 ms ± 78 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+# %timeit set_nodes(data = random_data)
+# 1.85 ms ± 78 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 
 sortlat2 = ordered_attr(R, "lat")
 set_edges(G = R, ordered = sortlat2, dist = .08)
 len(R.edges)
 
-#%timeit ordered_attr(R, "lat")
-#1.33 ms ± 60.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-#%timeit set_edges(R, sortlat2, dist = .08)
-#66.8 ms ± 3.61 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+# %timeit ordered_attr(R, "lat")
+# 1.33 ms ± 60.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+# %timeit set_edges(R, sortlat2, dist = .08)
+# 66.8 ms ± 3.61 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 
 nx.draw_random(R, node_size = 10)
-#plt.savefig('R graph')
+# plt.savefig('R graph')
 
 RR = set_nodes(data = random_data)
 set_edges2(RR, dist = .08)
 len(RR.edges)
-#%timeit set_edges2(RR)
-#2.72 s ± 114 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+# %timeit set_edges2(RR)
+# 2.72 s ± 114 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 
 RRR = set_nodes(data = random_data)
 set_edges3(RRR, dist = .08)
-#%timeit set_edges3(RRR)
-#3.75 s ± 89.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+# %timeit set_edges3(RRR)
+# 3.75 s ± 89.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 
 
-#The cost of the function set_Edges and set_Edges2 should belong to the same 
-#Order of magnitude O(nlogn) because of the sorting cost. However set_Edges 
-#seems to perform faster than set_Edges2 according to timeit module.
-#The cost of the function set_Edges3 is instead O(n^2) because every node is 
-#compared to every other n-1 nodes
+# The cost of the function set_Edges and set_Edges2 should belong to the same
+# Order of magnitude O(nlogn) because of the sorting cost. However set_Edges
+# seems to perform faster than set_Edges2 according to timeit module.
+# The cost of the function set_Edges3 is instead O(n^2) because every node is
+# compared to every other n-1 nodes
 
 def distance(v, w):
     """
@@ -350,14 +351,20 @@ triangles_count_R = len(triangles_discover(R))
 # print(triangles_count_R)
 # 12
 
+
 # %timeit (triangles_discover(P))
 # 1.01 ms ± 51.5 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 # %timeit (triangles_discover(R))
 # 4.52 ms ± 194 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
+# %timeit sum(nx.triangles(P).values())/3
+# 2.29 ms ± 138 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+# %timeit sum(nx.triangles(R).values())/3
+# 14 ms ± 1.17 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
 #### Centralities:
 #### Eccentricity
+
 def ecc(start, graph):
     """Given a graph and a vertex v of the graph, it returns the eccentricity 
     of v
@@ -397,4 +404,11 @@ for node in list(r.nodes()):
 # 63.3 ms ± 5.3 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 # %timeit for node in list(r.nodes()):r.nodes[node]["eccentricity"] = ecc(graph=r, start=node)
 # 236 µs ± 20.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+
+star_graph = nx.star_graph(4)
+nx.draw(star_graph)
+
+for node in list(star_graph.nodes()):
+    star_graph.nodes[node]["eccentricity"] = ecc(graph=star_graph, start=node)
+nx.get_node_attributes(star_graph, "eccentricity").values()
 
