@@ -28,7 +28,8 @@ newd = d[begin:]
 
 
 def set_nodes(data=newd):
-    """given the data set (list of dictionaries), it builds the "province" Graph
+    """
+    Given the data set (list of dictionaries), it builds the "province" Graph
     where nodes are provinces and their attributes are relative latitude and 
     longitude
     """
