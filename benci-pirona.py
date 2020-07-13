@@ -342,11 +342,11 @@ print(triangles_count_R)
 #%timeit (triangles_discover(R))
 #4.52 ms ± 194 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
-#%timeit (triangles_discover(P))
-#1.11 ms ± 41.2 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-#%timeit (triangles_discover(R))
-#4.66 ms ± 186 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
+#%timeit sum(nx.triangles(P).values())/3
+#2.29 ms ± 138 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+#%timeit sum(nx.triangles(R).values())/3
+#14 ms ± 1.17 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
 
 ####Centralities:
 ####Eccentricity
@@ -392,4 +392,13 @@ for node in list(r.nodes()):
 #63.3 ms ± 5.3 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 #%timeit for node in list(r.nodes()):r.nodes[node]["eccentricity"] = ecc(graph=r, start=node)   
 #236 µs ± 20.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+
+
+
+star_graph = nx.star_graph(4)
+nx.draw(star_graph)
+
+for node in list(star_graph.nodes()):
+    star_graph.nodes[node]["eccentricity"] = ecc(graph=star_graph, start=node)
+nx.get_node_attributes(star_graph, "eccentricity").values()
 
