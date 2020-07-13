@@ -1,3 +1,4 @@
+#%%
 # libraries
 import json
 import networkx as nx
@@ -7,7 +8,7 @@ from datetime import datetime
 from collections import deque
 
 # open data
-with open('/home/noe/Università/in_corso/Algoritmi/APAD-project/dati/dati-json/dpc-covid19-ita-province.json') as f:
+with open('./Data/dpc-covid19-ita-province.json') as f:
     d = json.load(f)
 
 today = d[len(d)-1].get("data")
@@ -219,10 +220,4 @@ for node in list(r.nodes()):
 
 
 
-
-
-
-
-
-
-
+# %%
